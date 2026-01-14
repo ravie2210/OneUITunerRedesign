@@ -1,0 +1,33 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "master", "main" ] # Trigger on pushes to these branches
+  workflow_dispatch: # Allows you to run this manually from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4 # Downloads your repo code
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # Adjust if the project needs an older version like '11'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew # Ensures the build script can run
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug # Compiles the code into an APK
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk # Location of the finished file
